@@ -24,7 +24,7 @@ module.exports = function(homebridge) {
 
   // For platform plugin to be considered as dynamic platform plugin,
   // registerPlatform(pluginName, platformName, constructor, dynamic), dynamic must be true
-  homebridge.registerPlatform("homebridge-dyson-link", "DysonPlatform", DysonPlatform, true);
+  homebridge.registerPlatform("homebridge-dyson-link-reygonzales", "DysonPlatform", DysonPlatform, true);
 }
 
 class DysonPlatform {
@@ -89,7 +89,7 @@ class DysonPlatform {
           platform.log("Device not cached. Create a new one");
           let dysonAccessory = new Accessory(accessory.displayName, uuid);
           new DysonLinkAccessory(accessory.displayName, device, dysonAccessory, platform.log, nightModeVisible, focusModeVisible, autoModeVisible);
-          platform.api.registerPlatformAccessories("homebridge-dyson-link", "DysonPlatform", [dysonAccessory]);
+          platform.api.registerPlatformAccessories("homebridge-dyson-link-reygonzales", "DysonPlatform", [dysonAccessory]);
           platform.accessories.push(accessory);
           } else {
           platform.log("Device cached. Try to update this");

@@ -1,6 +1,6 @@
 {
-  "name": "homebridge-dyson-link",
-  "version": "2.4.0",
+  "name": "homebridge-dyson-link-reygonzales",
+  "version": "1.0.0",
   "description": "Homebridge Plugin for Dyson Link",
   "main": "index.js",
   "scripts": {
@@ -18,12 +18,12 @@
     "node": ">=8.0.0",
     "homebridge": ">=0.4.0"
   },
-  "author": "joe-ng",
+  "author": "reygonzales",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/joe-ng/homebridge-dyson-link/issues"
+    "url": "https://github.com/reygonzales/homebridge-dyson-link/issues"
   },
-  "homepage": "https://github.com/joe-ng/homebridge-dyson-link#readme",
+  "homepage": "https://github.com/reygonzales/homebridge-dyson-link#readme",
   "dependencies": {
     "mqtt": "~> 2.15.0"
   }

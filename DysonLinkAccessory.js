@@ -13,8 +13,6 @@ function setHomebridge(homebridge) {
 
 class DysonLinkAccessory {
     constructor(displayName, device, accessory, log, nightModeVisible, focusModeVisible, autoModeVisible) {
-
-
         this.device = device;
         this.device.accessory = this;
 
@@ -29,15 +27,6 @@ class DysonLinkAccessory {
         this.initSensor();
         this.initFanState();
     }
-
-    // updateFanState() {
-    //     this.fan.getCharacteristic(Characteristic.On).updateValue(this.device.fanState.fanOn);        
-    //     this.autoSwitch.getCharacteristic(Characteristic.On).updateValue(this.device.fanState.fanAuto);        
-
-    //     if (this.device.heatAvailable) {
-    //         this.heatSwitch.getCharacteristic(Characteristic.On).updateValue(this.device.fanState.fanHeat);
-    //     }
-    // }
 
     initSensor() {
         this.log("Init Sensor for " + this.displayName);
@@ -108,12 +97,12 @@ class DysonLinkAccessory {
             this.accessory.removeService(autoSwitch);
         }
 
-        this.fan = this.getService(Service.Fanv2); 
+        this.fan = this.getService(Service.Fanv2);
 
         this.fan.getCharacteristic(Characteristic.Active)
             .on("get", this.device.isFanOn.bind(this.device))
             .on("set", this.device.setFanOn.bind(this.device));
-            
+
         this.fan.getCharacteristic(Characteristic.SwingMode)
             .on("get", this.device.isRotate.bind(this.device))
             .on("set", this.device.setRotate.bind(this.device));
@@ -123,7 +112,7 @@ class DysonLinkAccessory {
         // Don't seem to be called by homekit at all
         // this.fan.getCharacteristic(Characteristic.CurrentFanState)
         //     .on("set", this.device.setCurrentFanState.bind(this.device))
-        //     .on("get", this.device.getCurrentFanState.bind(this.device));     
+        //     .on("get", this.device.getCurrentFanState.bind(this.device));
 
         // This is actually the fan speed instead of rotation speed but homekit fan does not support this
         this.fan.getCharacteristic(Characteristic.RotationSpeed)
@@ -131,7 +120,7 @@ class DysonLinkAccessory {
                 minStep: 10
             })
             .on("get", this.device.getFanSpeed.bind(this.device))
-            .on("set", this.device.setFanSpeed.bind(this.device));        
+            .on("set", this.device.setFanSpeed.bind(this.device));
 
         if(this.nightModeVisible) {
             this.log.info("Night mode button is added");
@@ -150,7 +139,7 @@ class DysonLinkAccessory {
             }
         }
 
-        // Create FilterMaintenance 
+        // Create FilterMaintenance
         this.filter = this.getService(Service.FilterMaintenance);
         this.filter.getCharacteristic(Characteristic.FilterChangeIndication)
             .on("get", this.device.getFilterChange.bind(this.device));
@@ -162,7 +151,7 @@ class DysonLinkAccessory {
         this.fan.getCharacteristic(Characteristic.FilterLifeLevel)
             .on("get", this.device.getFilterLife.bind(this.device));
 
-        // Set Heat 
+        // Set Heat
         if (this.device.heatAvailable) {
             this.log("Heat Available. Add Heat button and jet control");
             this.heater = this.getService(Service.HeaterCooler);
@@ -209,8 +198,8 @@ class DysonLinkAccessory {
             //     .on("set", this.device.setHeatOn.bind(this.device));
 
 
-            
-            
+
+
             // Set the auto/manual mode in the FanV2 just for Cool/Heat device as it seemed to be problem for cool device
             // Removed this for now as FanV2 is not working for this
             // this.fan.getCharacteristic(Characteristic.TargetFanState)
@@ -224,7 +213,7 @@ class DysonLinkAccessory {
             }
 
             this.autoSwitch = this.getServiceBySubtype(Service.Switch, "Auto - " + this.displayName, "Auto");
-            
+
             this.autoSwitch
                 .getCharacteristic(Characteristic.On)
                 .on("get", this.device.isFanAuto.bind(this.device))
@@ -245,7 +234,7 @@ class DysonLinkAccessory {
                     .on("get", this.device.isFanAuto.bind(this.device))
                     .on("set", this.device.setFanAuto.bind(this.device));
             }
-            
+
         }
 
         // Add jet focus for Cool/Heat and 2018 Cool device
@@ -254,7 +243,7 @@ class DysonLinkAccessory {
             if(this.focusModeVisible) {
                 this.log.info("Jet Focus mode button is added");
                 this.focusSwitch = this.getServiceBySubtype(Service.Switch, "Jet Focus - " + this.displayName, "Jet Focus");
-                
+
                 this.focusSwitch
                     .getCharacteristic(Characteristic.On)
                     .on("get", this.device.isFocusedJet.bind(this.device))
@@ -284,30 +273,25 @@ class DysonLinkAccessory {
         if (!service) {
             service = this.accessory.addService(serviceType, displayName, subType);
         }
-
         return service;
     }
 
-    isSwingModeButtonOn(){
+    isSwingModeButtonOn() {
         return this.fan.getCharacteristic(Characteristic.SwingMode).value;
-
     }
 
-    getFanSpeedValue(){
+    getFanSpeedValue() {
         return this.fan.getCharacteristic(Characteristic.RotationSpeed).value;
     }
 
-
-    isNightModeSwitchOn(){
+    isNightModeSwitchOn() {
         if(this.nightModeSwitch) {
             return this.nightModeSwitch.getCharacteristic(Characteristic.On).value;
-        }
-        else {
+        } else {
             return false;
         }
     }
 }
-
 
 module.exports = {
     DysonLinkAccessory, setHomebridge

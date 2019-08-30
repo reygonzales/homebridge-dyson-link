@@ -47,58 +47,56 @@ class DysonPlatform {
           let accountPassword = this.config.password || process.env.DYSON_PASSWORD;
           let accountEmail = this.config.email || process.env.DYSON_EMAIL;
           this.getDevicesFromAccount(accountEmail, accountPassword, config.country, (accountDevices) => {
-          this.config.accessories.forEach((accessory) => {
-          let nightModeVisible = accessory.nightModeVisible;
-          if(nightModeVisible == null || nightModeVisible == undefined) {
-          platform.log.debug("no night mode visible value, default to true");
-          nightModeVisible = true;
-          }
-          let focusModeVisible = accessory.focusModeVisible;
-          if(focusModeVisible == null || focusModeVisible == undefined) {
-          platform.log.debug("no focus mode visible value, default to true");
-          focusModeVisible = true;
-          }
-          let autoModeVisible = accessory.autoModeVisible;
-          if(autoModeVisible == null || autoModeVisible == undefined) {
-          platform.log.debug("no auto mode visible value, default to true");
-          autoModeVisible = true;
-          }
-          let deviceInfo = accountDevices[accessory.serialNumber];
-          var password = ''
-          if (deviceInfo) {
-          platform.log("Use device password from account");
-          password = deviceInfo.password;
-          accessory.serialNumber = 'DYSON-'+accessory.serialNumber+'-'+deviceInfo.ProductType;
-          }
-          else if (accessory.password) {
-          platform.log("Use device password from config file");
-          password = crypto.createHash('sha512').update(accessory.password, "utf8").digest("base64");
-          }
-          else {
-          platform.log.error("Missing password for device with serial number " + accessory.serialNumber + ", devices found on your account: " + Object.keys(accountDevices).join(", "));
-          return;
-          }
-          platform.log(accessory.displayName + " IP:" + accessory.ip + " Serial Number:" + accessory.serialNumber);
-          let device = new DysonLinkDevice(accessory.displayName, accessory.ip, accessory.serialNumber, password, platform.log);
-          if (device.valid) {
-          platform.log("Device serial number format valids");
-          let uuid = UUIDGen.generate(accessory.serialNumber);
-          // Check if the accessory got cached
-          let cachedAccessory = platform.accessories.find((item) => item.UUID === uuid);
-          if (!cachedAccessory) {
-          platform.log("Device not cached. Create a new one");
-          let dysonAccessory = new Accessory(accessory.displayName, uuid);
-          new DysonLinkAccessory(accessory.displayName, device, dysonAccessory, platform.log, nightModeVisible, focusModeVisible, autoModeVisible);
-          platform.api.registerPlatformAccessories("homebridge-dyson-link-reygonzales", "DysonPlatform", [dysonAccessory]);
-          platform.accessories.push(accessory);
-          } else {
-          platform.log("Device cached. Try to update this");
-          cachedAccessory.displayName = accessory.displayName;
-          new DysonLinkAccessory(accessory.displayName, device, cachedAccessory, platform.log, nightModeVisible, focusModeVisible, autoModeVisible);
-          platform.api.updatePlatformAccessories([cachedAccessory]);
-          }
-          }
-          });
+            this.config.accessories.forEach((accessory) => {
+              let nightModeVisible = accessory.nightModeVisible;
+              if (nightModeVisible == null || nightModeVisible == undefined) {
+                platform.log.debug("no night mode visible value, default to true");
+                nightModeVisible = true;
+              }
+              let focusModeVisible = accessory.focusModeVisible;
+              if (focusModeVisible == null || focusModeVisible == undefined) {
+                platform.log.debug("no focus mode visible value, default to true");
+                focusModeVisible = true;
+              }
+              let autoModeVisible = accessory.autoModeVisible;
+              if (autoModeVisible == null || autoModeVisible == undefined) {
+                platform.log.debug("no auto mode visible value, default to true");
+                autoModeVisible = true;
+              }
+              let deviceInfo = accountDevices[accessory.serialNumber];
+              var password = ''
+              if (deviceInfo) {
+                platform.log("Use device password from account");
+                password = deviceInfo.password;
+                accessory.serialNumber = 'DYSON-' + accessory.serialNumber + '-' + deviceInfo.ProductType;
+              } else if (accessory.password) {
+                platform.log("Use device password from config file");
+                password = crypto.createHash('sha512').update(accessory.password, "utf8").digest("base64");
+              } else {
+                platform.log.error("Missing password for device with serial number " + accessory.serialNumber + ", devices found on your account: " + Object.keys(accountDevices).join(", "));
+                return;
+              }
+              platform.log(accessory.displayName + " IP:" + accessory.ip + " Serial Number:" + accessory.serialNumber);
+              let device = new DysonLinkDevice(accessory.displayName, accessory.ip, accessory.serialNumber, password, platform.log);
+              if (device.valid) {
+                platform.log("Device serial number format valids");
+                let uuid = UUIDGen.generate(accessory.serialNumber);
+                // Check if the accessory got cached
+                let cachedAccessory = platform.accessories.find((item) => item.UUID === uuid);
+                if (!cachedAccessory) {
+                  platform.log("Device not cached. Create a new one");
+                  let dysonAccessory = new Accessory(accessory.displayName, uuid);
+                  new DysonLinkAccessory(accessory.displayName, device, dysonAccessory, platform.log, nightModeVisible, focusModeVisible, autoModeVisible);
+                  platform.api.registerPlatformAccessories("homebridge-dyson-link-reygonzales", "DysonPlatform", [dysonAccessory]);
+                  platform.accessories.push(accessory);
+                } else {
+                  platform.log("Device cached. Try to update this");
+                  cachedAccessory.displayName = accessory.displayName;
+                  new DysonLinkAccessory(accessory.displayName, device, cachedAccessory, platform.log, nightModeVisible, focusModeVisible, autoModeVisible);
+                  platform.api.updatePlatformAccessories([cachedAccessory]);
+                }
+              }
+            });
           });
         } else {
           platform.log.error("Unable to find config or accessories");
@@ -181,7 +179,9 @@ class DysonPlatform {
           hostname: DYSON_API_URL,
           port: 443,
           path: '/v2/provisioningservice/manifest',
-          headers: {"Authorization": auth},
+          headers: {
+            "Authorization": auth
+          },
           rejectUnauthorized: false
         };
         // Request devices in user's account to get local credentials
@@ -208,13 +208,13 @@ class DysonPlatform {
           });
         });
         req.on('error', function(err) {
-          this.log.error("Error logging in, check Dyson email, password, and country - "+err);
+          this.log.error("Error logging in, check Dyson email, password, and country - " + err);
         });
         req.end();
       });
     });
     req.on('error', function(err) {
-      this.log.error("Error logging in, check Dyson email, password, and country - "+err);
+      this.log.error("Error logging in, check Dyson email, password, and country - " + err);
     });
     req.write(postBody);
     req.end();
